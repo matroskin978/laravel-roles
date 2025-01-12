@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Post;
 use App\Models\User;
+use App\Policies\PostPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,10 +24,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
 
-        Gate::before(function (User $user, string $ability) {
+//        Gate::policy(Post::class, PostPolicy::class);
+
+        /*Gate::before(function (User $user, string $ability) {
             if ($user->role === 3) {
                 return true;
             }
+            return null;
         });
 
         Gate::define('create-post', function (User $user) {
@@ -41,7 +45,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('delete-post', function (User $user) {
 //            return false;
             return $user->role === 3;
-        });
+        });*/
 
     }
 }

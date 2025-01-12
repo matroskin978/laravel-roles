@@ -15,11 +15,11 @@
                 <h3>{{ $post->title }}</h3>
                 Author: {{ $post->user->name }}
 
-                @can('update-post', $post)
+                @can('update', $post)
                     <a href="{{ route('posts.edit', $post->id) }}" class="text-primary">Edit</a>
                 @endcan
 
-                @can('delete-post')
+                @can('delete', $post)
                     <form action="{{ route('posts.destroy', $post->id) }}" method="post">
                         @csrf
                         @method('DELETE')

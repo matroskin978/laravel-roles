@@ -13,6 +13,7 @@ class PostController extends Controller
      */
     public function index()
     {
+//        Gate::authorize('viewAny', Post::class);
         $posts = Post::with('user')->orderBy('id', 'desc')->get();
         return view('posts.index', [
             'posts' => $posts
@@ -25,9 +26,13 @@ class PostController extends Controller
     public function create()
     {
 //        Gate::authorize('create-post');
-        if (Gate::denies('create-post')) {
+//        Gate::authorize('create', Post::class);
+        if (\request()->user()->cannot('create', Post::class)) {
             abort(403);
         }
+        /*if (Gate::denies('create-post')) {
+            abort(403);
+        }*/
         return view('posts.create');
     }
 
@@ -36,9 +41,10 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        if (Gate::denies('create-post')) {
+        Gate::authorize('create', Post::class);
+        /*if (Gate::denies('create-post')) {
             abort(403);
-        }
+        }*/
 
         $validated = $request->validate([
             'title' => ['required', 'max:255'],
@@ -66,9 +72,10 @@ class PostController extends Controller
     public function edit(string $id)
     {
         $post = Post::query()->findOrFail($id);
-        if (!Gate::allows('update-post', $post)) {
+        Gate::authorize('update', $post);
+        /*if (!Gate::allows('update-post', $post)) {
             abort(403);
-        }
+        }*/
 
         return view('posts.edit', [
             'post' => $post,
@@ -78,12 +85,13 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Post $post)
     {
-        $post = Post::query()->findOrFail($id);
-        if (!Gate::allows('update-post', $post)) {
+//        $post = Post::query()->findOrFail($id);
+        Gate::authorize('update', $post);
+        /*if (!Gate::allows('update-post', $post)) {
             abort(403);
-        }
+        }*/
 
         $validated = $request->validate([
             'title' => ['required', 'max:255'],
@@ -95,12 +103,13 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Post $post)
     {
-        if (!Gate::allows('delete-post')) {
+        Gate::authorize('delete', $post);
+        /*if (!Gate::allows('delete-post')) {
             abort(403);
-        }
-        $post = Post::query()->findOrFail($id);
+        }*/
+//        $post = Post::query()->findOrFail($id);
         $post->delete();
         return redirect()->route('home')->with('success', 'Success delete');
     }
